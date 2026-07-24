@@ -149,6 +149,15 @@ figpng("fig_labelled",    plot(mod, rowname = "COUNTRY"))
 figpng("fig_cex_values",  plot(mod, cex = c("withdrawal"), values = c("Domestic"), pch = 23))
 figpng("fig_factors13",   plot(mod, factors = c(1,3)))
 figpng("fig_xlim_ylim",   plot(mod, xlim = c(-1.5,1.5), ylim = c(-1.5,1.5), main = "Freshwater Q/R biplot"))
+## documented-argument stress cases (each exercises a scalar-condition path)
+figpng("fig_values_true", plot(mod, cex = c("withdrawal"), values = TRUE, pch = 23))
+figpng("fig_abline_num",  plot(mod, abline = c(-0.5, 0.5)))
+figpng("fig_xlim_qr",     plot(mod, xlim = "qr"))
+figpng("fig_rd_style",    plot(mod, rowname = "COUNTRY", cex = c("withdrawal"),
+                                legend = "topleft", values = TRUE, pch = 23))
+mtr_ok <- try(qrfactor(csv, var = var, t = c("withdrawal","Resources")), silent = TRUE)
+if (!inherits(mtr_ok, "try-error"))
+  figpng("fig_transformed", plot(mtr_ok, main = "sqrt-transformed withdrawal & Resources"))
 
 ## =====================================================================
 ## PART 2 — SPATIAL (shapefile)

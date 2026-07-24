@@ -170,12 +170,12 @@ else
 variables=variables
 }
 
-if(scale=="log"&&transform==""){
+if(scale=="log"&&all(transform=="")){
 variables=log(variables)
 
 }
 
-if(scale=="sqrt"&&transform==""){
+if(scale=="sqrt"&&all(transform=="")){
 variables=sqrt(variables)
 }
 
@@ -627,7 +627,7 @@ x$gisdata <- .qr_as_sp(x$gisdata)
 ## dispatch on it.
 plotarg <- plot
 log=FALSE
-if((x$normal=="log"||x$normal=="sqrt"||x$transform!="")&&(values!="original"||values!="data")){
+if((x$normal=="log"||x$normal=="sqrt"||any(x$transform!=""))&&(values!="original"||values!="data")){
 main=paste(main,"[",x$normal,"]",sep=" ")
 log=TRUE
 }
@@ -665,7 +665,7 @@ cex1=x$data[cex1]
 
 }
 
-if(values=="original"||values=="data"){
+if(length(values)==1 && (values=="original"||values=="data")){
 
 if(typeof(x$gisdata[cex2])=="S4")
 
@@ -705,7 +705,7 @@ this=1
 
 if(typeof(values)!="logical"){
 
-if(values=="original"||values=="data"){
+if(length(values)==1 && (values=="original"||values=="data")){
 
 if(typeof(x$gisdata[cex2])=="S4")
 
@@ -775,14 +775,14 @@ if(typeof(abline)!="logical"){
 b1=abline[1]
 b2=abline[2]
 
-if(abline=="shift"||abline=="Shift"||abline=="move"){
+if(length(abline)==1 && (abline=="shift"||abline=="Shift"||abline=="move")){
 row=x$r.loading
 b=row[cexa[[1]],]
 b1= b[factors[1]]
 b2= b[factors[2]]
 }
 }
-if(xlim=="yes"||xlim=="r"){
+if(length(xlim)==1 && (xlim=="yes"||xlim=="r")){
 rmin1=min(x$r.loading[,factors[1]])
 qmin1=min(x$q.loading[,factors[1]])
 rmax1=max(x$r.loading[,factors[1]])
@@ -805,11 +805,11 @@ ylim=c(ymin,ymax)
 #ylim=c(min(x$r.loading[,factors[2]]),max(x$r.loading[,factors[2]]))
 }
 
-if(ylim=="yes"||ylim=="q"){
+if(length(ylim)==1 && (ylim=="yes"||ylim=="q")){
 xlim=c(min(x$q.loading[,factors[1]]),max(x$q.loading[,factors[1]]))
 ylim=c(min(x$q.loading[,factors[2]]),max(x$q.loading[,factors[2]]))
 }
-if(xlim=="rq"||xlim=="qr"){
+if(length(xlim)==1 && (xlim=="rq"||xlim=="qr")){
 xlim=c(min(x$r.loading[,factors[1]]),max(x$r.loading[,factors[1]]))
 ylim=c(min(x$r.loading[,factors[2]]),max(x$q.loading[,factors[2]]))
 
@@ -931,7 +931,7 @@ abline(h=b2)
 }
 else
 {
-if(abline==TRUE){
+if(length(abline)==1 && abline==TRUE){
 abline(v=0)
 abline(h=0)
 }
@@ -967,7 +967,7 @@ if(typeof(values)!="logical"){
 text(x$q.loading[,factors[1]],x$q.loading[,factors[2]], labels=(values[[1]]), cex=0.9, pos=1,col="blue")  
 }
 else{
-if(values==TRUE){
+if(length(values)==1 && values==TRUE){
 values=cex1[[1]]
 if(typeof(values[[1]][1])=="double"){
 if(log==TRUE){
@@ -1016,7 +1016,12 @@ i=i+1
 }
  #windows(xpos = 0, ypos = 0)
 
-# Graphical Assessment of Multivariate Normality
+# Graphical Assessment of Multivariate Normality.
+# Wrapped in try(): the Mahalanobis distance and mvoutlier::aq.plot both
+# invert the covariance matrix, which fails when variables are collinear
+# (a singular matrix). The histograms above still render; only this
+# multivariate-normality panel is skipped, with a clear message.
+mvn <- try({
 xx <- as.matrix(x$data) # n x p numeric matrix
 center <- colMeans(xx) # centroid
 n <- nrow(xx); p <- ncol(xx); cov <- cov(xx);
@@ -1024,12 +1029,18 @@ d <- mahalanobis(xx,center,cov) # distances
 qqplot(qchisq(ppoints(n),df=p),d,
   main=main,
   ylab="Mahalanobis D2")
-abline(a=0,b=1) 
+abline(a=0,b=1)
 
  #windows(xpos = 0, ypos = 0)
 
 outliers <-aq.plot(x$data)
 print(outliers)
+}, silent=TRUE)
+if(inherits(mvn,"try-error")){
+warning("Multivariate-normality / outlier diagnostics skipped: the ",
+        "covariance matrix is singular (collinear variables). Drop or ",
+        "combine near-duplicate variables.", call.=FALSE)
+}
 
 #print(mshapiro.test(x$data) )
 
