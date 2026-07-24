@@ -79,12 +79,10 @@ variables=object[var]
 else{
 #check input data
 if(source==""){
-print("Full Folder path is needed:source")
-return
+stop("Full folder path is needed: 'source'", call. = FALSE)
 }
 if(layer==""){
-print("Map name is needed: layer")
-return
+stop("Map name is needed: 'layer'", call. = FALSE)
 }
 
 object <- .qr_read(source, layer)
