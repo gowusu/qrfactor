@@ -4,7 +4,7 @@ Title: Simultaneous Q-Mode and R-Mode Factor Analysis for Spatial Data
 Version: 1.5
 Date: 2026-07-23
 Authors@R: person("George", "Owusu", role = c("aut", "cre"),
-                  email = "gowusu@gmail.com")
+                  email = "owusugeorge@ug.edu.gh")
 Description: Performs Q-mode and R-mode factor analysis simultaneously on
     spatial and non-spatial data. A single function, qrfactor(), carries out
     principal component analysis, R-mode factor analysis, Q-mode factor
@@ -21,4 +21,4 @@ Encoding: UTF-8
 NeedsCompilation: no
 Packaged: 2026-07-23 16:10:03 UTC; root
 Author: George Owusu [aut, cre]
-Maintainer: George Owusu <gowusu@gmail.com>
+Maintainer: George Owusu <owusugeorge@ug.edu.gh>
