@@ -39,6 +39,7 @@ License: GPL-2
 3. The fitted object: your workbench
 4. Getting the data
 5. `qrfactor()`: the one call
+5b. Data types, and the assumptions behind them
 6. PCA — the shared foundation
 7. R-mode: structure among variables
 8. Q-mode: structure among samples
@@ -60,6 +61,8 @@ License: GPL-2
 22. Distributional diagnostics: `type="diagnose"`
 23. Joining a CSV to a shapefile
 24. Using an in-memory spatial object
+24b. The African water paradox, in numbers
+24c. What makes `qrfactor` robust
 
 **Part 3 — reference**
 25. `qrfactor()` argument reference
@@ -233,6 +236,51 @@ frame you can call it with no other arguments:
 # equivalent, from an in-memory data frame:
 mod <- qrfactor(raw[var])
 ```
+
+## 5b. Data types, and the assumptions behind them
+
+`qrfactor` is built on the eigen-decomposition of a correlation or covariance
+matrix, so its native input is **quantitative**. But the door is wider than that
+if you prepare the data:
+
+- **Quantitative (continuous / ratio)** — the intended input: withdrawals,
+  areas, concentrations, counts. Used directly.
+- **Ordinal (Likert, ranks, ordered classes)** — treat as numeric. Scoring a
+  1–5 agreement scale and analysing it is standard practice in the social
+  sciences; it is an approximation (the gaps are assumed equal), but a
+  serviceable one.
+- **Qualitative / nominal (categories, presence–absence)** — **not** analysed
+  raw; encode it numerically first. Turn a category into **indicator (0/1)
+  columns**, or use **frequencies / counts** per class. Once the column is
+  numeric, every analysis in this manual works on it.
+
+> **On correspondence and coordinate views.** `type="coord"` (PCoA) and
+> `type="ca"` (correspondence) *relabel* the ordination axes — and on ordinary
+> Euclidean data principal-coordinate analysis is mathematically the same as
+> PCA, so the PCoA view is exact. But `type="ca"` shows the eigen-biplot under a
+> "Correspondence Analysis" title; it is a **presentation view, not** the
+> chi-square decomposition of a contingency table that a statistician means by
+> CA. For true correspondence analysis of categorical/frequency data, dummy-code
+> it here, or use `MASS::corresp` / the `ca` package. Stated plainly so no
+> reviewer is surprised.
+
+**What the factor model assumes** (and how this dataset measures up):
+
+1. **Numeric, roughly interval-scaled variables** — met (or met via the encoding
+   above).
+2. **Linear associations.** Factor analysis captures *linear* correlation;
+   threshold or strongly nonlinear structure is missed. Skewed variables should
+   be transformed (§13) — the water data are heavily right-skewed (§22).
+3. **Enough samples for the variables.** Rule of thumb: ≥ 5–10 observations per
+   variable. Here **50 countries for 6 variables** — comfortable.
+4. **No perfect multicollinearity.** Near-duplicate variables make the matrix
+   singular. This dataset *violates* it — `Agricultur` and `perCapitaW` correlate
+   0.99, which collapses the sixth eigenvalue to ~0 and disables the Mahalanobis
+   outlier panel (§22, §29). Drop or combine such pairs.
+5. **Real correlations exist.** If variables are near-independent, the factors
+   summarise little. (KMO and Bartlett tests that quantify this are a planned
+   addition, not in 1.5.)
+6. **Outliers distort correlations.** Screen with `type="diagnose"` (§22).
 
 ## 6. PCA — the shared foundation
 
@@ -721,6 +769,39 @@ availability is real in these data, but explaining it (climate, economy,
 irrigation policy, data year) is the domain expert's job, not the factor
 model's. `qrfactor` locates the pattern; it does not explain it.
 
+## 24c. What makes qrfactor robust
+
+The package is designed so an applied user rarely gets *stuck*:
+
+- **Pure-R core.** The whole analysis — correlation/covariance, eigen-solve,
+  loadings, scores, indices — is base R. No compiled code, no build tools, and
+  it installs and runs anywhere R does.
+- **Graceful degradation.** When a diagnostic can't run — for example the
+  Mahalanobis/`mvoutlier` outlier panel on collinear data, where the covariance
+  matrix is singular — the plot method now **skips that one panel with a clear
+  warning and continues**, instead of aborting the whole figure (§22). You get
+  the histograms and the message, not a stack trace.
+- **Dependency resilience.** The spatial stack it originally relied on
+  (`rgdal`, `maptools`, `mgraph`) was retired from CRAN. `qrfactor` 1.5 replaces
+  them with a thin `sf`/`sp` compatibility layer: shapefiles are read with `sf`,
+  drawn with `sp`, and the conversion is automatic — so the package survives the
+  modern R geospatial ecosystem rather than dying with its old dependencies.
+- **Five ways in, one analysis out.** Data frame, CSV/text file, ESRI
+  shapefile, an in-memory spatial object, or a live CSV↔shapefile join — the
+  *same* method regardless of how your data arrives (§5, §17, §23, §24).
+- **One object, many views.** Every quantity is stored on the returned object
+  *and*, for spatial input, written back onto the map's attribute table (§18),
+  so downstream plots and maps never recompute the analysis.
+- **Modern-R hardened.** Under R ≥ 4.2 a logical condition of length > 1 is an
+  error, not a silent first-element take. The constructor and the ~1700-line
+  plot method were swept for this, so documented argument forms — a vector of
+  variables in `t=`, a numeric `xlim`/`ylim`, string axis shortcuts, custom
+  `abline` — all work instead of crashing.
+
+None of this changes the statistics; it changes how often the statistics
+actually reach you. That is what "robust" means here: **the method is classical;
+the packaging is defensive.**
+
 ---
 
 # PART 3 — Reference
@@ -753,9 +834,18 @@ plot(x, factors=c(1,2), type="loading", plot="",
      values=FALSE, nfactors=3, rowname=TRUE, par=c(1,2), ...)
 ```
 
-- **`type`** — *what* to draw: `"loadings"` (default), `"scores"`, `"pca"`
-  (**lowercase** — `"PCA"` falls through to the default biplot),
-  `"coord"`/`"coordinate"`, `"mds"`, `"diagnose"`, `"cluster"`.
+- **`type`** — *what* to draw. The full set:
+
+  | `type` | Draws |
+  |---|---|
+  | `"loadings"` (default) | the Q/R loadings biplot |
+  | `"scores"` | factor scores instead of loadings |
+  | `"pca"` | PCA (eigenvector) loadings — **lowercase**; `"PCA"` silently falls back to the default biplot |
+  | `"coord"` / `"coordinate"` | principal-coordinate view (≡ PCA on Euclidean data) |
+  | `"mds"` | multidimensional-scaling view (use with `scale="n"`) |
+  | `"ca"` / `"correspondence"` | eigen-biplot relabelled as "Correspondence Analysis" — a *view*, not true chi-square CA (§5b) |
+  | `"diagnose"` | histograms + Q–Q + multivariate outliers |
+  | `"cluster"` | `clusplot` + `pvclust` cluster diagnostics |
 - **`plot`** — *which panels*: `""` (combined), `"r"`, `"q"`, `"qr"`, `"all"`,
   `"map"`, `"cluster"`, `"compare"`, `"anova"`, `"nonparametric"`.
 - **`factors`** — the two axes to draw, e.g. `c(1,2)`, `c(1,3)`.

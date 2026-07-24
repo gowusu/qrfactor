@@ -136,6 +136,8 @@ show("t=c('withdrawal','Resources') eigen.value",
 ## ---- 10. All the non-spatial plots (named PNGs) --------------------
 sec("10. Non-spatial plots -> figures/*.png")
 figpng("fig_pca_all",     plot(mod, type = "PCA", plot = "all"))
+figpng("fig_pca_loadings",plot(mod, type = "pca"))   # lowercase: true PCA-loadings plot
+figpng("fig_ca_view",     plot(mod, type = "ca"))    # correspondence-labelled view
 figpng("fig_rmode",       plot(mod, type = "loadings", plot = "r"))
 figpng("fig_qmode",       plot(mod, type = "loadings", plot = "q"))
 figpng("fig_qmode_scores",plot(mod, type = "scores",  plot = "q"))

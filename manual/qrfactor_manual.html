@@ -257,6 +257,8 @@ workbench</a></li>
 data</a></li>
 <li><a href="#qrfactor-the-one-call" id="toc-qrfactor-the-one-call">5.
 <code>qrfactor()</code>: the one call</a></li>
+<li><a href="#b.-data-types-and-the-assumptions-behind-them" id="toc-b.-data-types-and-the-assumptions-behind-them">5b. Data types,
+and the assumptions behind them</a></li>
 <li><a href="#pca-the-shared-foundation" id="toc-pca-the-shared-foundation">6. PCA — the shared
 foundation</a></li>
 <li><a href="#r-mode-structure-among-variables" id="toc-r-mode-structure-among-variables">7. R-mode: structure among
@@ -300,6 +302,8 @@ shapefile</a></li>
 spatial object</a></li>
 <li><a href="#b.-the-african-water-paradox-in-numbers" id="toc-b.-the-african-water-paradox-in-numbers">24b. The African water
 paradox, in numbers</a></li>
+<li><a href="#c.-what-makes-qrfactor-robust" id="toc-c.-what-makes-qrfactor-robust">24c. What makes qrfactor
+robust</a></li>
 </ul></li>
 <li><a href="#part-3-reference" id="toc-part-3-reference">PART 3 —
 Reference</a>
@@ -353,19 +357,20 @@ printed here.</p>
 <p><strong>Part 1 — the method, step by step</strong> 1. What this
 package does 2. Installing and loading 3. The fitted object: your
 workbench 4. Getting the data 5. <code>qrfactor()</code>: the one call
-6. PCA — the shared foundation 7. R-mode: structure among variables 8.
-Q-mode: structure among samples 9. Simultaneous Q+R: the biplot 10.
-Scores 11. <code>print()</code> and <code>summary()</code> 12. Scaling:
-the single most important choice 13. Transforming skewed variables 14.
-Principal coordinate analysis (PCoA) 15. Multidimensional scaling
-(MDS)</p>
+5b. Data types, and the assumptions behind them 6. PCA — the shared
+foundation 7. R-mode: structure among variables 8. Q-mode: structure
+among samples 9. Simultaneous Q+R: the biplot 10. Scores 11.
+<code>print()</code> and <code>summary()</code> 12. Scaling: the single
+most important choice 13. Transforming skewed variables 14. Principal
+coordinate analysis (PCoA) 15. Multidimensional scaling (MDS)</p>
 <p><strong>Part 2 — spatial mode</strong> 16. From table to map 17.
 Reading a shapefile 18. Scores written back to the attribute table 19.
 <code>plot=&quot;map&quot;</code>: the choropleths 20. Clustering:
 <code>plot=&quot;cluster&quot;</code> and <code>&quot;compare&quot;</code> 21. Testing the
 clusters: ANOVA and Kruskal–Wallis 22. Distributional diagnostics:
 <code>type=&quot;diagnose&quot;</code> 23. Joining a CSV to a shapefile 24. Using
-an in-memory spatial object</p>
+an in-memory spatial object 24b. The African water paradox, in numbers
+24c. What makes <code>qrfactor</code> robust</p>
 <p><strong>Part 3 — reference</strong> 25. <code>qrfactor()</code>
 argument reference 26. <code>plot.qrfactor()</code> argument reference
 27. The object’s elements 28. Reproducing the figures 29. Honest limits
@@ -542,6 +547,62 @@ spatial object</strong>, and a <strong>CSV↔︎shapefile join</strong>. Part
 no other arguments:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># equivalent, from an in-memory data frame:</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">qrfactor</span>(raw[var])</span></code></pre></div>
+<h2 id="b.-data-types-and-the-assumptions-behind-them">5b. Data types,
+and the assumptions behind them</h2>
+<p><code>qrfactor</code> is built on the eigen-decomposition of a
+correlation or covariance matrix, so its native input is
+<strong>quantitative</strong>. But the door is wider than that if you
+prepare the data:</p>
+<ul>
+<li><strong>Quantitative (continuous / ratio)</strong> — the intended
+input: withdrawals, areas, concentrations, counts. Used directly.</li>
+<li><strong>Ordinal (Likert, ranks, ordered classes)</strong> — treat as
+numeric. Scoring a 1–5 agreement scale and analysing it is standard
+practice in the social sciences; it is an approximation (the gaps are
+assumed equal), but a serviceable one.</li>
+<li><strong>Qualitative / nominal (categories,
+presence–absence)</strong> — <strong>not</strong> analysed raw; encode
+it numerically first. Turn a category into <strong>indicator (0/1)
+columns</strong>, or use <strong>frequencies / counts</strong> per
+class. Once the column is numeric, every analysis in this manual works
+on it.</li>
+</ul>
+<blockquote>
+<p><strong>On correspondence and coordinate views.</strong>
+<code>type=&quot;coord&quot;</code> (PCoA) and <code>type=&quot;ca&quot;</code>
+(correspondence) <em>relabel</em> the ordination axes — and on ordinary
+Euclidean data principal-coordinate analysis is mathematically the same
+as PCA, so the PCoA view is exact. But <code>type=&quot;ca&quot;</code> shows the
+eigen-biplot under a “Correspondence Analysis” title; it is a
+<strong>presentation view, not</strong> the chi-square decomposition of
+a contingency table that a statistician means by CA. For true
+correspondence analysis of categorical/frequency data, dummy-code it
+here, or use <code>MASS::corresp</code> / the <code>ca</code> package.
+Stated plainly so no reviewer is surprised.</p>
+</blockquote>
+<p><strong>What the factor model assumes</strong> (and how this dataset
+measures up):</p>
+<ol type="1">
+<li><strong>Numeric, roughly interval-scaled variables</strong> — met
+(or met via the encoding above).</li>
+<li><strong>Linear associations.</strong> Factor analysis captures
+<em>linear</em> correlation; threshold or strongly nonlinear structure
+is missed. Skewed variables should be transformed (§13) — the water data
+are heavily right-skewed (§22).</li>
+<li><strong>Enough samples for the variables.</strong> Rule of thumb: ≥
+5–10 observations per variable. Here <strong>50 countries for 6
+variables</strong> — comfortable.</li>
+<li><strong>No perfect multicollinearity.</strong> Near-duplicate
+variables make the matrix singular. This dataset <em>violates</em> it —
+<code>Agricultur</code> and <code>perCapitaW</code> correlate 0.99,
+which collapses the sixth eigenvalue to ~0 and disables the Mahalanobis
+outlier panel (§22, §29). Drop or combine such pairs.</li>
+<li><strong>Real correlations exist.</strong> If variables are
+near-independent, the factors summarise little. (KMO and Bartlett tests
+that quantify this are a planned addition, not in 1.5.)</li>
+<li><strong>Outliers distort correlations.</strong> Screen with
+<code>type=&quot;diagnose&quot;</code> (§22).</li>
+</ol>
 <h2 id="pca-the-shared-foundation">6. PCA — the shared foundation</h2>
 <p>Every analysis here starts from the eigen-decomposition of the
 (scaled) data. The eigenvalues tell you how many axes matter; their
@@ -1089,6 +1150,48 @@ causal claim. The decoupling of use from availability is real in these
 data, but explaining it (climate, economy, irrigation policy, data year)
 is the domain expert’s job, not the factor model’s.
 <code>qrfactor</code> locates the pattern; it does not explain it.</p>
+<h2 id="c.-what-makes-qrfactor-robust">24c. What makes qrfactor
+robust</h2>
+<p>The package is designed so an applied user rarely gets
+<em>stuck</em>:</p>
+<ul>
+<li><strong>Pure-R core.</strong> The whole analysis —
+correlation/covariance, eigen-solve, loadings, scores, indices — is base
+R. No compiled code, no build tools, and it installs and runs anywhere R
+does.</li>
+<li><strong>Graceful degradation.</strong> When a diagnostic can’t run —
+for example the Mahalanobis/<code>mvoutlier</code> outlier panel on
+collinear data, where the covariance matrix is singular — the plot
+method now <strong>skips that one panel with a clear warning and
+continues</strong>, instead of aborting the whole figure (§22). You get
+the histograms and the message, not a stack trace.</li>
+<li><strong>Dependency resilience.</strong> The spatial stack it
+originally relied on (<code>rgdal</code>, <code>maptools</code>,
+<code>mgraph</code>) was retired from CRAN. <code>qrfactor</code> 1.5
+replaces them with a thin <code>sf</code>/<code>sp</code> compatibility
+layer: shapefiles are read with <code>sf</code>, drawn with
+<code>sp</code>, and the conversion is automatic — so the package
+survives the modern R geospatial ecosystem rather than dying with its
+old dependencies.</li>
+<li><strong>Five ways in, one analysis out.</strong> Data frame,
+CSV/text file, ESRI shapefile, an in-memory spatial object, or a live
+CSV↔︎shapefile join — the <em>same</em> method regardless of how your
+data arrives (§5, §17, §23, §24).</li>
+<li><strong>One object, many views.</strong> Every quantity is stored on
+the returned object <em>and</em>, for spatial input, written back onto
+the map’s attribute table (§18), so downstream plots and maps never
+recompute the analysis.</li>
+<li><strong>Modern-R hardened.</strong> Under R ≥ 4.2 a logical
+condition of length &gt; 1 is an error, not a silent first-element take.
+The constructor and the ~1700-line plot method were swept for this, so
+documented argument forms — a vector of variables in <code>t=</code>, a
+numeric <code>xlim</code>/<code>ylim</code>, string axis shortcuts,
+custom <code>abline</code> — all work instead of crashing.</li>
+</ul>
+<p>None of this changes the statistics; it changes how often the
+statistics actually reach you. That is what “robust” means here:
+<strong>the method is classical; the packaging is
+defensive.</strong></p>
 <hr />
 <h1 id="part-3-reference">PART 3 — Reference</h1>
 <h2 id="qrfactor-argument-reference">25. <code>qrfactor()</code>
@@ -1160,30 +1263,75 @@ attribute table</td>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">abline=</span><span class="cn">TRUE</span>, <span class="at">legend=</span><span class="st">&quot;topright&quot;</span>, <span class="at">legendvalues=</span><span class="fu">c</span>(<span class="dv">100</span>),</span>
 <span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">values=</span><span class="cn">FALSE</span>, <span class="at">nfactors=</span><span class="dv">3</span>, <span class="at">rowname=</span><span class="cn">TRUE</span>, <span class="at">par=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), ...)</span></code></pre></div>
 <ul>
-<li><strong><code>type</code></strong> — <em>what</em> to draw:
-<code>&quot;loadings&quot;</code> (default), <code>&quot;scores&quot;</code>,
-<code>&quot;pca&quot;</code> (<strong>lowercase</strong> — <code>&quot;PCA&quot;</code>
-falls through to the default biplot),
-<code>&quot;coord&quot;</code>/<code>&quot;coordinate&quot;</code>, <code>&quot;mds&quot;</code>,
-<code>&quot;diagnose&quot;</code>, <code>&quot;cluster&quot;</code>.</li>
-<li><strong><code>plot</code></strong> — <em>which panels</em>:
+<li><p><strong><code>type</code></strong> — <em>what</em> to draw. The
+full set:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>type</code></th>
+<th>Draws</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>&quot;loadings&quot;</code> (default)</td>
+<td>the Q/R loadings biplot</td>
+</tr>
+<tr class="even">
+<td><code>&quot;scores&quot;</code></td>
+<td>factor scores instead of loadings</td>
+</tr>
+<tr class="odd">
+<td><code>&quot;pca&quot;</code></td>
+<td>PCA (eigenvector) loadings — <strong>lowercase</strong>;
+<code>&quot;PCA&quot;</code> silently falls back to the default biplot</td>
+</tr>
+<tr class="even">
+<td><code>&quot;coord&quot;</code> / <code>&quot;coordinate&quot;</code></td>
+<td>principal-coordinate view (≡ PCA on Euclidean data)</td>
+</tr>
+<tr class="odd">
+<td><code>&quot;mds&quot;</code></td>
+<td>multidimensional-scaling view (use with <code>scale=&quot;n&quot;</code>)</td>
+</tr>
+<tr class="even">
+<td><code>&quot;ca&quot;</code> / <code>&quot;correspondence&quot;</code></td>
+<td>eigen-biplot relabelled as “Correspondence Analysis” — a
+<em>view</em>, not true chi-square CA (§5b)</td>
+</tr>
+<tr class="odd">
+<td><code>&quot;diagnose&quot;</code></td>
+<td>histograms + Q–Q + multivariate outliers</td>
+</tr>
+<tr class="even">
+<td><code>&quot;cluster&quot;</code></td>
+<td><code>clusplot</code> + <code>pvclust</code> cluster
+diagnostics</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong><code>plot</code></strong> — <em>which panels</em>:
 <code>&quot;&quot;</code> (combined), <code>&quot;r&quot;</code>, <code>&quot;q&quot;</code>,
 <code>&quot;qr&quot;</code>, <code>&quot;all&quot;</code>, <code>&quot;map&quot;</code>,
 <code>&quot;cluster&quot;</code>, <code>&quot;compare&quot;</code>, <code>&quot;anova&quot;</code>,
-<code>&quot;nonparametric&quot;</code>.</li>
-<li><strong><code>factors</code></strong> — the two axes to draw,
-e.g. <code>c(1,2)</code>, <code>c(1,3)</code>.</li>
-<li><strong><code>rowname</code></strong> — a column name to label
-points (e.g. <code>&quot;COUNTRY&quot;</code>).</li>
-<li><strong><code>cex</code></strong> — magnify text, or a variable name
-to size points by a variable.</li>
-<li><strong><code>values</code></strong> — <code>TRUE</code>, or a
-variable name, to annotate points with values.</li>
-<li><strong><code>xlim</code>/<code>ylim</code></strong> —
+<code>&quot;nonparametric&quot;</code>.</p></li>
+<li><p><strong><code>factors</code></strong> — the two axes to draw,
+e.g. <code>c(1,2)</code>, <code>c(1,3)</code>.</p></li>
+<li><p><strong><code>rowname</code></strong> — a column name to label
+points (e.g. <code>&quot;COUNTRY&quot;</code>).</p></li>
+<li><p><strong><code>cex</code></strong> — magnify text, or a variable
+name to size points by a variable.</p></li>
+<li><p><strong><code>values</code></strong> — <code>TRUE</code>, or a
+variable name, to annotate points with values.</p></li>
+<li><p><strong><code>xlim</code>/<code>ylim</code></strong> —
 <code>&quot;optimise&quot;</code> (auto), numeric <code>c(lo,hi)</code>, or the
-shortcuts <code>&quot;r&quot;</code>/<code>&quot;q&quot;</code>/<code>&quot;qr&quot;</code>.</li>
-<li><strong><code>abline</code></strong> — <code>TRUE</code> for
-reference axes, or <code>c(intercept, slope)</code>.</li>
+shortcuts <code>&quot;r&quot;</code>/<code>&quot;q&quot;</code>/<code>&quot;qr&quot;</code>.</p></li>
+<li><p><strong><code>abline</code></strong> — <code>TRUE</code> for
+reference axes, or <code>c(intercept, slope)</code>.</p></li>
 </ul>
 <div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mod, <span class="at">factors =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))                                <span class="co"># other axes</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mod, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.5</span>,<span class="fl">1.5</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.5</span>,<span class="fl">1.5</span>))          <span class="co"># fixed limits</span></span>
