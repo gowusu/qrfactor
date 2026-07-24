@@ -1,0 +1,132 @@
+Paper 3 diagnostics — run at capture time
+qrfactor 1.5 | psych 2.6.5 | spdep 1.4.2 
+
+
+========== M3: cleaned variable set ==========
+variables: Domestic, Industry, Agricultur, Resources, withdrawal 
+n = 50 
+
+
+========== M2: factorability ==========
+
+-- correlation matrix --
+           Domestic Industry Agricultur Resources withdrawal
+Domestic      1.000    0.748      0.328    -0.191      0.292
+Industry      0.748    1.000      0.465    -0.146      0.647
+Agricultur    0.328    0.465      1.000    -0.121      0.629
+Resources    -0.191   -0.146     -0.121     1.000     -0.044
+withdrawal    0.292    0.647      0.629    -0.044      1.000
+
+-- KMO (overall MSA + per variable) --
+Kaiser-Meyer-Olkin factor adequacy
+Call: psych::KMO(r = X)
+Overall MSA =  0.56
+MSA for each item = 
+  Domestic   Industry Agricultur  Resources withdrawal 
+      0.50       0.56       0.70       0.78       0.52 
+
+-- Bartlett's test of sphericity --
+$chisq
+[1] 98.19423
+
+$p.value
+[1] 1.251694e-16
+
+$df
+[1] 10
+
+
+
+========== retention: parallel analysis ==========
+Parallel analysis suggests that the number of factors =  NA  and the number of components =  1 
+suggested # components (parallel analysis): 1 
+component eigenvalues:
+[1] 2.609 1.020 0.823 0.416 0.133
+
+
+========== M2: 2-factor PCA, varimax rotated ==========
+
+Loadings:
+           RC1    RC2   
+Domestic    0.612 -0.519
+Industry    0.844 -0.320
+Agricultur  0.783       
+Resources          0.892
+withdrawal  0.867       
+
+                 RC1   RC2
+SS loadings    2.452 1.176
+Proportion Var 0.490 0.235
+Cumulative Var 0.490 0.726
+
+communalities:
+  Domestic   Industry Agricultur  Resources withdrawal 
+     0.644      0.815      0.613      0.797      0.760 
+
+uniquenesses:
+  Domestic   Industry Agricultur  Resources withdrawal 
+     0.356      0.185      0.387      0.203      0.240 
+
+variance accounted for:
+                        RC1   RC2
+SS loadings           2.452 1.176
+Proportion Var        0.490 0.235
+Cumulative Var        0.490 0.726
+Proportion Explained  0.676 0.324
+Cumulative Proportion 0.676 1.000
+
+-- qrfactor eigenvalues (cleaned set) --
+[1] 2.6088 1.0196 0.8229 0.4155 0.1331
+-- variance % --
+[1] 52.18 20.39 16.46  8.31  2.66
+-- cumulative % --
+[1]  52.18  72.57  89.03  97.34 100.00
+
+
+========== M7: cluster-number diagnostics ==========
+k = 2   avg silhouette width = 0.517   within-SS = 155.4 
+k = 3   avg silhouette width = 0.492   within-SS = 113.2 
+k = 4   avg silhouette width = 0.536   within-SS = 75 
+k = 5   avg silhouette width = 0.552   within-SS = 51.2 
+k = 6   avg silhouette width = 0.515   within-SS = 39.2 
+
+
+========== M4: Moran's I / LISA ==========
+-- neighbour structure --
+Neighbour list object:
+Number of regions: 50 
+Number of nonzero links: 196 
+Percentage nonzero weights: 7.84 
+Average number of links: 3.92 
+4 regions with no links:
+8, 11, 28, 50
+5 disjoint connected subgraphs
+
+Global Moran's I  [Factor1]:  I = 0.354   E[I] = -0.022   p = 3.76e-05
+
+Global Moran's I  [Factor2]:  I = 0.169   E[I] = -0.022   p = 0.0215
+
+Global Moran's I  [index]:  I = 0.303   E[I] = -0.022   p = 0.001
+
+Global Moran's I  [index2]:  I = 0.167   E[I] = -0.022   p = 0.0362
+
+-- Local Moran (LISA) for Factor 1 index, most significant 15 --
+                          COUNTRY     Ii      p
+                          Algeria  0.917 0.0157
+                            Egypt  2.706 0.0176
+                            Congo  2.059 0.0243
+                         Tanzania -0.077 0.0261
+                         Botswana  0.900 0.0294
+ Democratic Republic of the Congo  0.959 0.0374
+                          Tunisia  1.049 0.0577
+                           Rwanda  1.133 0.0585
+                       Mozambique -1.170 0.0589
+         Central African Republic  1.105 0.0678
+                          Burundi  0.616 0.0950
+                            Libya  0.922 0.1145
+                          Nigeria -0.181 0.1300
+                       Mauritania  0.966 0.1440
+                          Lesotho  0.541 0.1567
+
+
+DONE
