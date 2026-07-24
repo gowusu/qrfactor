@@ -15,3 +15,7 @@ src/*.dll
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Regenerable manual repro dumps (kept out of git; figures committed with the manual)
+manual/repro_output.txt
+manual/repro_anova_dump.txt

@@ -148,7 +148,7 @@ variables=.qr_attr(object)[var]
 ## for the non-spatial case.
 object <- .qr_as_sp(object)
 
-if(transform!=""){
+if(any(transform!="")){
 if(scale==""||scale=="sd"){
 scale="sqrt"
 }
@@ -640,7 +640,7 @@ main=main
 #graphics.off()
 par(cex="0.7",cex.lab="0.9")
 this=1
-if(cex==""){
+if(length(cex)==1 && cex==""){
 cex=0.9
 
 }
@@ -816,7 +816,7 @@ ylim=c(min(x$r.loading[,factors[2]]),max(x$q.loading[,factors[2]]))
 
 }
 
-if(xlim=="optimise"||ylim=="optimise"){
+if((length(xlim)==1 && xlim=="optimise")||(length(ylim)==1 && ylim=="optimise")){
 
 rmin1=min(x$r.loading[,factors[1]])
 qmin1=min(x$q.loading[,factors[1]])
@@ -835,8 +835,8 @@ xmax=max(rmax1,qmax1)
 ymin=min(rmin2,qmin2)
 ymax=max(rmax2,qmax2)
 
-xlim=c(xmin-margin,xmax+margin)
-ylim=c(ymin-margin,ymax+margin)
+if(length(xlim)==1 && xlim=="optimise") xlim=c(xmin-margin,xmax+margin)
+if(length(ylim)==1 && ylim=="optimise") ylim=c(ymin-margin,ymax+margin)
 }
 
 xlab=paste("Factor ",factors[1],"(",round(x$variance[factors[1]],2),"%)")
@@ -916,7 +916,7 @@ text(x$pca.loadings[,factors[1]],x$pca.loadings[,factors[2]], row.names( x$pca.l
 }else{
 
 if(type=="cluster"||type=="compare"||plot=="cluster"||plot=="compare"){
-if(par==""){
+if(length(par)==1 && par==""){
 par=c(1,2)
 }
 par(mfrow=par)
@@ -997,7 +997,7 @@ legend=legend(legend, legend = round(legValsAvg,0), pch = pch, pt.cex = legVals,
 if(type=="diagnose"||plot=="diagnose"){
 labels=names(x$data)
 
-if(par==""){
+if(length(par)==1 && par==""){
 variableslen=round(length(labels)/2,0)
 par(mfrow=c(2,variableslen))
 if(length(labels)>6){
@@ -1157,7 +1157,7 @@ pvrect(fit, alpha=.95)
 
 fit <- kmeans(scale(x$data), nfactors,...) # 
 labels=names(x$data)
-if(par==""){
+if(length(par)==1 && par==""){
 variableslen=round(length(labels)/2,0)
 par(mfrow=c(2,variableslen))
 if(length(labels)>6){
@@ -1756,7 +1756,7 @@ Scale=TRUE
 
 
 #here
-if(par==""){
+if(length(par)==1 && par==""){
 par(mfrow=c(1,2))
 
 }else
@@ -2157,7 +2157,7 @@ if(plotarg=="admin"||type=="admin"){
 
 
 #here
-if(par==""){
+if(length(par)==1 && par==""){
 par(mfrow=c(1,2))
 
 }else
