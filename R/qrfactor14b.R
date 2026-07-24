@@ -139,6 +139,17 @@ row.names(object)=row.names(.qr_attr(object))
 variables=.qr_attr(object)[var]
 }
 
+## Route spatial input through the Spatial*/S4 code path used below. The
+## analysis and index-writing code was written (and repaired) against sp
+## Spatial*DataFrame objects: it branches on typeof(object)=="list" vs
+## S4 and, in the S4 branch, reads/writes the attribute table via
+## .qr_attr(). rq() now reads shapefiles as sf, whose typeof is "list",
+## so without this it would take the data-frame branch and break on sf's
+## sticky geometry column. Converting once here restores the intended
+## path. Plain data-frame input is not an sf object, so this is a no-op
+## for the non-spatial case.
+object <- .qr_as_sp(object)
+
 if(transform!=""){
 if(scale==""||scale=="sd"){
 scale="sqrt"
