@@ -89,6 +89,18 @@ biplot. When the input is a shapefile, it also writes the resulting scores and
 cluster memberships straight back to the map's attribute table, so the last
 step of the analysis is a map.
 
+> **The problem this manual solves — Africa's water paradox.**
+> Africa is described, in the same breath, as *water-rich* and *water-stressed*.
+> Both cannot be true everywhere. The question has two sides that a single
+> method rarely answers together: **(R-mode)** which measurements define how a
+> country uses water, and **(Q-mode)** which countries resemble each other in
+> that use? We put the bundled data — domestic, industrial and agricultural
+> withdrawal, renewable resources, total and per-capita withdrawal for 50
+> African countries — through one `qrfactor()` call and read the answer off the
+> biplot and the map. The finding, developed across this manual: **water *use*
+> and water *availability* are almost independent, and the heaviest users are
+> on average the least resource-endowed.** That is the paradox, quantified.
+
 Six analyses come out of the one function:
 
 | Analysis | What it answers |
@@ -191,6 +203,15 @@ use, renewable resources, total withdrawal, and per-capita withdrawal:
 var <- c("Domestic","Industry","Agricultur","Resources","withdrawal","perCapitaW")
 ```
 
+**Reading the raw data.** Even before any analysis, the extremes hint at the
+paradox. The largest *agricultural* users are **Swaziland (839), Sudan (835),
+Madagascar (710) and Egypt (695)** — arid or irrigation-dependent economies.
+The largest *renewable resource* holders are **Congo (1283) and the Democratic
+Republic of the Congo (832)** — equatorial, water-abundant, yet with tiny
+withdrawals (Congo's total is 0.03). So the countries with the most water are
+not the ones using the most. Factor analysis turns that eyeball impression into
+measured axes.
+
 ## 5. `qrfactor()`: the one call
 
 Point `qrfactor()` at the CSV and name the variables. That is the whole model.
@@ -235,6 +256,31 @@ axes 74%.** By the Kaiser rule (eigenvalue > 1) you retain **two** factors
 (3.36 and 1.08; the third is 0.91, just under 1). The sixth eigenvalue is
 essentially zero — a signal that two variables are nearly redundant (Section
 29).
+
+**Where those axes come from — the correlations.** The decomposition is driven
+by the correlation matrix (`round(mod$correlation, 2)`):
+
+```
+           Domestic Industry Agricultur Resources withdrawal perCapitaW
+Domestic      1.00     0.75       0.33     -0.19       0.29       0.44
+Industry      0.75     1.00       0.47     -0.15       0.65       0.55
+Agricultur    0.33     0.47       1.00     -0.12       0.63       0.99
+Resources    -0.19    -0.15      -0.12      1.00      -0.04      -0.14
+withdrawal    0.29     0.65       0.63     -0.04       1.00       0.65
+perCapitaW    0.44     0.55       0.99     -0.14       0.65       1.00
+```
+
+Three facts jump out, and together they *are* the paradox:
+1. **`Agricultur` and `perCapitaW` correlate 0.99** — in Africa, per-capita
+   water use is agricultural water use; irrigation dominates the total. (This
+   near-duplication is why the 6th eigenvalue collapses to zero; Section 29.)
+2. **`Domestic` and `Industry` correlate 0.75** — the two "modern-economy" uses
+   rise together with development and urbanisation.
+3. **`Resources` correlates with everything at −0.04 to −0.19** — renewable
+   *availability* is essentially uncorrelated with (if anything, weakly opposed
+   to) *use*. Having water and using water are decoupled. This is why
+   `Resources` gets a factor almost to itself (Factor 2), instead of joining the
+   use variables on Factor 1.
 
 The PCA loadings (eigenvectors) live in `mod$pca`:
 
@@ -313,11 +359,27 @@ plot(mod)                       # or plot(mod, type = "loadings")
 
 ![Simultaneous Q/R biplot](figures/fig_simultaneous.png)
 
-The axis labels carry the variance explained (Factor 1 = 56%, Factor 2 = 18%).
-Variables pointing the same way are correlated; countries near a variable score
-high on it. `Resources` sits opposite the use variables, and the countries
-strung along the bottom-right (e.g. 12, 14) are the resource-heavy,
-low-use cases.
+**Reading the biplot** (axis labels carry the variance: Factor 1 = 56%, Factor
+2 = 18%). Variables pointing the same way are correlated; a country plotted near
+a variable scores high on it. The plot resolves into meaningful regions:
+
+- **Far left — the heavy users.** Point 16 (**Egypt**) is the extreme, joined by
+  42 (**Sudan**), 28 (**Madagascar**), 27 (**Libya**), 30 (**Mali**), 31
+  (**Mauritania**) and 43 (**Swaziland**) — the big agricultural abstractors,
+  sitting where the `Agricultur`/`perCapitaW`/`withdrawal` arrows point. High
+  water use = **negative Factor 1**.
+- **Bottom-right — the water-rich.** Points 12 (**Congo**) and 14 (**DR Congo**)
+  sit alone by the `Resources` arrow: vast renewable supply, almost no
+  withdrawal. High resources = **negative Factor 2**.
+- **Top — the domestic/industrial economies.** Point 17 (**Equatorial Guinea**,
+  domestic use 132, agriculture ~1) with 1 (**Algeria**) and 4 (**Botswana**),
+  where `Domestic` and `Industry` point.
+- **Dense right cluster — the low-use majority.** The tight knot of small
+  economies (Comoros, Cape Verde, Djibouti, Gambia, Rwanda, Togo, Uganda…).
+
+So the axes read as: **Factor 1 = the overall scale of (agriculture-driven)
+water use; Factor 2 = the resource-versus-use contrast.** Congo and Egypt land
+almost as far apart as the data allows — one has the water, the other uses it.
 
 The combined loadings and scores are available directly:
 
@@ -559,6 +621,27 @@ Domestic, Industry, Agricultur, withdrawal and perCapitaW all separate the two
 clusters at p < 0.001; `Resources` does not (F = 0.90, p = 0.35) — the clusters
 are defined by *use*, not by *availability*, exactly as Factor 1 suggested.
 
+**The two African water profiles.** The cluster means (`plot="cluster"` also
+prints these) name the groups:
+
+| Variable | Cluster A (light users) | Cluster B (heavy users) |
+|---|---:|---:|
+| Domestic | 10.7 | 52.9 |
+| Industry | 3.3 | 17.6 |
+| Agricultur | 56 | 448 |
+| withdrawal | 1.2 | 14.1 |
+| perCapitaW | 70 | 519 |
+| **Resources** | **128** | **59** |
+
+Cluster **B** — the heavy users (Egypt, Sudan, Libya, Mali, South Africa,
+Morocco…) — withdraws roughly **8× more agricultural water** per country than
+Cluster A, yet sits on **less than half the renewable resource** (59 vs 128).
+Cluster **A** — the light users — is the water-rich majority. **This is the
+paradox measured on the ground: the countries drawing down the most water are,
+on average, the least well supplied.** The analysis has turned a rhetorical
+claim ("water-rich yet water-stressed") into two quantified groups a
+policymaker can name and map.
+
 ## 22. Distributional diagnostics: `type="diagnose"`
 
 `type="diagnose"` draws a histogram (with a fitted normal curve) for every
@@ -608,6 +691,35 @@ m2 <- qrfactor(gisobj, layer = "gisobject", var = var)
 class(m2)
 #> [1] "qrfactor"
 ```
+
+## 24b. The African water paradox, in numbers
+
+Pulling the whole analysis together — every figure here came from one
+`qrfactor()` call on the bundled data:
+
+| Question | What `qrfactor` answered |
+|---|---|
+| How many axes matter? | Two (Kaiser): 56% + 18% = **74%** of the variation |
+| What is Factor 1? | The **scale of water use**, driven by agriculture (loadings −0.79 to −0.91) |
+| What is Factor 2? | The **resource-vs-use contrast** (`Resources` alone, loading −0.68) |
+| Is use tied to availability? | **No** — `Resources` correlates −0.04 to −0.19 with every use variable |
+| Which variable is redundant? | `perCapitaW` ≈ `Agricultur` (r = **0.99**); the 6th eigenvalue ≈ 0 |
+| Who uses the most? | **Egypt, Sudan, Madagascar, Libya, Mali, Mauritania, Swaziland** |
+| Who has the most water? | **Congo, DR Congo** — and they barely use it |
+| Do the groups differ? | Heavy vs light users separate at **p < 1e-6** on use, not on resources |
+| The paradox | Heavy users hold **59** units of resource on average; light users **128** |
+
+The methodological point for the applied reader: **one call did the work of a
+PCA, an R-mode factor analysis, a Q-mode classification, a cluster analysis, an
+ANOVA and a set of maps** — and, because it is map-first, the conclusion is not
+a table but a picture of the continent. A worked write-up of exactly this
+analysis is a natural applied paper (see `PUBLICATION_PLAN.md`, Paper 3).
+
+**An honest caveat on causation.** These are *associations* in a single
+cross-section of 50 countries, not a causal claim. The decoupling of use from
+availability is real in these data, but explaining it (climate, economy,
+irrigation policy, data year) is the domain expert's job, not the factor
+model's. `qrfactor` locates the pattern; it does not explain it.
 
 ---
 
