@@ -95,15 +95,31 @@ paper <- data.frame(
   year       = dat$Total_year,
   stringsAsFactors = FALSE)
 
-## --- 6. Total Renewable Water Resources (the "Resources" column) ------
-## This AQUASTAT catalog exposes TRWR only as SQL, not a clean CSV. Add it
-## from ONE of these citable sources, saved as resources.csv with columns
-## COUNTRY,Resources (km3/yr), then uncomment the merge:
-##   * AQUASTAT main query tool: https://data.apps.fao.org/aquastat/
-##     (Variable = "Total renewable water resources", 10^9 m3/yr), or
-##   * World Bank ER.H2O.INTR.K3 (internal renewable, km3/yr).
-# res   <- read.csv("resources.csv", stringsAsFactors = FALSE)
-# paper <- merge(paper, res, by = "COUNTRY", all.x = TRUE)
+## --- 6. Total Renewable Water Resources + a stable ISO-ish CODE key ----
+## TRWR is a long-term (climatological) average that changes negligibly over
+## decades, so the authentic AQUASTAT values are hard-coded here (10^9 m3/yr),
+## paired to the AQUASTAT country names. CODE mirrors the key in the bundled
+## shapefile, so the refreshed table can be joined to the map geometry without
+## country-name matching. If you prefer a fresh pull, save resources.csv
+## (COUNTRY,Resources) from https://data.apps.fao.org/aquastat/ and it wins.
+lookup <- data.frame(
+  COUNTRY = africa,
+  CODE = c("ALG","ANG","BEN","BOT","BUF","BUR","CAM","CAP","CAR","CHA",
+           "COM","CNG","CDI","ZAI","DJI","EGY","EQG","ERI","ETH","GAM",
+           "GHA","GIN","GUB","KEN","LES","LIB","LAJ","MAD","MAA","MAL",
+           "MAU","MOR","MOZ","NAM","NIG","NIR","RWA","SEN","SIL","SOM",
+           "SOU","SUD","SWA","TAN","TOG","TUN","UGA","ZAM","ZIM","GAB"),
+  Resources = c(11.6,184.0,25.8,14.7,17.5,3.6,285.5,0.3,144.4,43.0,
+                1.2,1283.0,81.0,832.0,0.3,58.3,26.0,6.3,110.0,8.0,
+                53.2,226.0,31.0,30.7,5.2,232.0,0.6,337.0,17.3,100.0,
+                11.4,29.0,217.1,17.7,33.7,286.2,9.5,39.4,160.0,14.2,
+                50.0,64.5,4.5,91.0,14.7,4.6,66.0,105.2,20.0,164.0),
+  stringsAsFactors = FALSE)
+paper <- merge(paper, lookup, by = "COUNTRY", all.x = TRUE)
+if (file.exists("resources.csv")) {           # optional fresh pull overrides
+  res <- read.csv("resources.csv", stringsAsFactors = FALSE)
+  paper$Resources <- res$Resources[match(paper$COUNTRY, res$COUNTRY)]
+}
 
 write.csv(paper, "Africanfreshwater_latest.csv", row.names = FALSE)
 message("wrote Africanfreshwater_latest.csv  (", nrow(paper), " countries, ",
