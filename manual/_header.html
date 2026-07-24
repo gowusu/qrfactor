@@ -1,0 +1,13 @@
+<style>
+  /* Override Pandoc's narrow default column with a wider, still-readable one */
+  html { font-size: 16px; }
+  body {
+    max-width: 62em;
+    margin: 2em auto;
+    padding: 0 1.5em;
+    line-height: 1.5;
+  }
+  /* Wide content (tables, code) may exceed the column — let it scroll, not overflow the page */
+  pre, table { max-width: 100%; overflow-x: auto; display: block; }
+  img { max-width: 100%; height: auto; }
+</style>
