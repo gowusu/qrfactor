@@ -66,7 +66,7 @@ for (nm in vars[-1]) tab <- merge(tab, latest_by_country(nm), by = "Area", all =
 africa <- c(
   "Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Cameroon",
   "Cabo Verde","Central African Republic","Chad","Comoros","Congo",
-  "Cote d'Ivoire","Democratic Republic of the Congo","Djibouti","Egypt",
+  "Côte d'Ivoire","Democratic Republic of the Congo","Djibouti","Egypt",
   "Equatorial Guinea","Eritrea","Ethiopia","Gambia","Ghana","Guinea",
   "Guinea-Bissau","Kenya","Lesotho","Liberia","Libya","Madagascar","Malawi",
   "Mali","Mauritania","Morocco","Mozambique","Namibia","Niger","Nigeria",
