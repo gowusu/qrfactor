@@ -36,6 +36,17 @@ packages:
 install.packages(c("sf", "sp"))
 ```
 
+## Manual
+
+A full, worked manual — every input mode, all six analyses, the plot method,
+the spatial maps and diagnostics, with every number and figure produced by
+running the package on the bundled African freshwater data:
+
+- [Read the manual (Markdown)](manual/qrfactor_manual.md) — renders on GitHub
+- `manual/qrfactor_manual.html` — self-contained HTML (all figures embedded)
+- `manual/qrfactor_manual.docx` — Word version (Save As → PDF for a printable copy)
+- `manual/reproduce_manual.R` — regenerates every table and figure
+
 ## Quick start
 
 Non-spatial (data frame) example:
