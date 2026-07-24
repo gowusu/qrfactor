@@ -620,6 +620,14 @@ label <- function(x,var=NULL,cex=0.8,pos=1) {
 ## sp-era plotting code below (coordinates(), spplot(), typeof=="S4"
 ## tests) behaves as originally written. No-op for non-spatial input.
 x$gisdata <- .qr_as_sp(x$gisdata)
+## The map branches below reuse the `plot` argument as a scratch variable
+## for spplot() objects, so by the time later dispatch blocks (anova,
+## ghana/region, admin) are reached it is no longer the scalar keyword the
+## caller passed. Under R >= 4.2 an if()/|| condition of length > 1 is an
+## error (it was a silent first-element take before), so those blocks
+## crash after a map is drawn. Keep the original scalar keyword here and
+## dispatch on it.
+plotarg <- plot
 log=FALSE
 if((x$normal=="log"||x$normal=="sqrt"||x$transform!="")&&(values!="original"||values!="data")){
 main=paste(main,"[",x$normal,"]",sep=" ")
@@ -1913,7 +1921,7 @@ plot(plot)
 }
 
 ##################anova analysis
-if(plot=="anova"||type=="anova"||type=="nonparametric"||plot=="nonparametric" ){
+if(plotarg=="anova"||type=="anova"||type=="nonparametric"||plotarg=="nonparametric" ){
 
 var2=x$data
 var4=c("index","meanindex1","means","rank1","meanrank1","cluster")
@@ -2001,7 +2009,7 @@ i=i+1
 
 }
 
-if(plot=="ghana"||type=="ghana"||plot=="region"||type=="region"){
+if(plotarg=="ghana"||type=="ghana"||plotarg=="region"||type=="region"){
 #source<-"C:/Users/george/Documents/Rpackages/multigis2/inst/external/Ghana"
 source<- system.file("external","Ghana", package = "qrfactor")
 
@@ -2146,7 +2154,7 @@ i=i+1
 
 
 }
-if(plot=="admin"||type=="admin"){
+if(plotarg=="admin"||type=="admin"){
 
 
 
