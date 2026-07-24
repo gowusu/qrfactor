@@ -1,5 +1,7 @@
 ^cran-comments\.md$
 ^manual$
+^README\.md$
+^\.github$
 ^\.git$
 ^\.gitignore$
 ^LICENSE\.md$
