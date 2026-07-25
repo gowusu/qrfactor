@@ -2,11 +2,16 @@
   /* Override Pandoc's narrow default column with a wider, still-readable one */
   html { font-size: 16px; }
   body {
-    max-width: 62em;
+    max-width: 82em;
     margin: 2em auto;
-    padding: 0 1.5em;
+    padding: 0 2em;
     line-height: 1.5;
   }
+  /* Figure captions (Pandoc puts the image alt text in <figcaption>) sit below
+     the image, centred and slightly smaller; table captions sit above. */
+  figure { margin: 1.5em 0; text-align: center; }
+  figcaption { font-size: 0.92em; color: #444; margin-top: 0.5em; text-align: left; }
+  caption { caption-side: top; font-weight: bold; text-align: left; margin-bottom: 0.4em; }
   /* Wide content (tables, code) may exceed the column — let it scroll, not overflow the page */
   pre, table { max-width: 100%; overflow-x: auto; display: block; }
   img { max-width: 100%; height: auto; }
