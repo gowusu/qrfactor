@@ -5,4 +5,5 @@
 ^\.github$
 ^\.git$
 ^\.gitignore$
+^\.claude$
 ^LICENSE\.md$

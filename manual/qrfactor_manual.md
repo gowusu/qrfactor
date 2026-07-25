@@ -9,7 +9,8 @@ call giving PCA, R-mode, Q-mode, simultaneous Q+R, principal coordinate
 analysis and multidimensional scaling. **Part 2** takes the *same* variables
 into spatial mode on the bundled African shapefile, writing factor scores back
 to the attribute table and drawing choropleth maps. **Part 3** is a full
-reference, a reproducibility script, and honest limits.
+reference, a reproducibility script, a glossary and exercises, and **Part 4** a
+set of student projects.
 
 Dr George Owusu
 Department of Geography and Resource Development, University of Ghana
@@ -28,57 +29,6 @@ License: GPL-2
 > The script that regenerates them, `reproduce_manual.R`, ships in this folder;
 > its console output is `repro_output.txt` and its figures are in `figures/`.
 > Run it and you get exactly the tables and plots printed here.
-
----
-
-## How to cite this manual
-
-The method implemented in `qrfactor` was introduced in a peer-reviewed paper;
-this manual is its applied companion. If you use the package or this manual in
-published work, please cite **both**.
-
-**The method (peer-reviewed source):**
-
-> Owusu, G. (2014). Developing R software for simultaneous estimation of Q- and
-> R-mode factor analyses using spatial and non-spatial data. *Mathematical
-> Theory and Modeling*, **4**(2). International Institute for Science, Technology
-> and Education (IISTE). ISSN 2224-5804 (print), 2225-0522 (online).
-
-**This manual:**
-
-> Owusu, G. (2026). *qrfactor: A manual to simultaneous Q- and R-mode factor
-> analysis of spatial data in R* (Version 1.5). Department of Geography and
-> Resource Development, University of Ghana.
-
-**BibTeX:**
-
-```bibtex
-@article{owusu2014qrfactor,
-  author  = {Owusu, George},
-  title   = {Developing {R} software for simultaneous estimation of
-             {Q-} and {R-}mode factor analyses using spatial and
-             non-spatial data},
-  journal = {Mathematical Theory and Modeling},
-  volume  = {4},
-  number  = {2},
-  year    = {2014},
-  publisher = {IISTE}
-}
-
-@manual{owusu2026qrfactormanual,
-  author       = {Owusu, George},
-  title        = {qrfactor: A Manual to Simultaneous Q- and R-mode
-                  Factor Analysis of Spatial Data in R},
-  note         = {Version 1.5},
-  organization = {Department of Geography and Resource Development,
-                  University of Ghana},
-  year         = {2026}
-}
-```
-
-Where the method's derivation or validation matters, cite the 2014 paper; where
-the workflow, arguments or worked African-water example are used, cite this
-manual. Citing both together is the intended practice.
 
 ---
 
@@ -127,9 +77,8 @@ manual. Citing both together is the intended practice.
 26. `plot.qrfactor()` argument reference
 27. The object's elements
 28. Reproducing the figures
-29. Honest limits and caveats
-30. Glossary
-31. Exercises
+29. Glossary
+30. Exercises
 
 **Part 4 — projects**
 33. The project brief template
@@ -356,7 +305,7 @@ if you prepare the data:
 4. **No perfect multicollinearity.** Near-duplicate variables make the matrix
    singular. This dataset *violates* it — `Agricultur` and `perCapitaW` correlate
    0.99, which collapses the sixth eigenvalue to ~0 and disables the Mahalanobis
-   outlier panel (Section 22, Section 29). Drop or combine such pairs.
+   outlier panel (Section 22). Drop or combine such pairs.
 5. **Real correlations exist.** If variables are near-independent, the factors
    summarise little. (KMO and Bartlett tests that quantify this are a planned
    addition, not in 1.5.)
@@ -401,7 +350,7 @@ perCapitaW    0.44     0.55       0.99     -0.14       0.65       1.00
 Three facts jump out, and together they *are* the paradox:
 1. **`Agricultur` and `perCapitaW` correlate 0.992** — in Africa, per-capita
    water use is agricultural water use; irrigation dominates the total. (This
-   near-duplication is why the 6th eigenvalue collapses to zero; Section 29.)
+   near-duplication is why the 6th eigenvalue collapses to zero.)
 2. **`Domestic` and `Industry` correlate 0.75** — the two "modern-economy" uses
    rise together with development and urbanisation.
 3. **`Resources` correlates with everything at −0.04 to −0.19** — renewable
@@ -910,7 +859,7 @@ plot(mod, type = "ca")
 
 ![Figure 9: Correspondence-analysis view of the water data. The layout is the shared-axis Q/R ordination presented under CA labels; the water-use variables and the heavy-use countries fall together, opposite the renewable-resource pole.](figures/fig_ca_view.png)
 
-**Interpretation, and honest scope.** On this continuous water table the CA view
+**Interpretation and scope.** On this continuous water table the CA view
 gives a valid ordination — the same use-versus-resource split, now framed as a
 correspondence layout. Where it becomes the *right* tool rather than an alternate
 label is when your data are genuinely a table of counts or categories: species ×
@@ -1310,9 +1259,9 @@ The methodological point for the applied reader: **one call did the work of a
 PCA, an R-mode factor analysis, a Q-mode classification, a cluster analysis, an
 ANOVA and a set of maps** — and, because it is map-first, the conclusion is not
 a table but a picture of the continent. A worked write-up of exactly this
-analysis is a natural applied paper (see `PUBLICATION_PLAN.md`, Paper 3).
+analysis is a natural applied paper.
 
-**An honest caveat on causation.** These are *associations* in a single
+**On causation.** These are *associations* in a single
 cross-section of 50 countries, not a causal claim. The decoupling of use from
 availability is real in these data, but explaining it (climate, economy,
 irrigation policy, data year) is the domain expert's job, not the factor
@@ -1450,23 +1399,7 @@ It exercises all five input modes, all six analyses, every `scale`/`type`/`plot`
 option, the print/summary/plot methods, the spatial maps, the diagnostics and
 the join — and logs each figure `ok`/`FAIL`.
 
-## 29. Honest limits and caveats
-
-- **Numeric data only.** Categorical or character columns must be dropped or
-  encoded first.
-- **Collinearity.** Near-duplicate variables (here `Agricultur` ≈ `perCapitaW`,
-  r = 0.992) drive the smallest eigenvalue to ~0 and make the Mahalanobis
-  diagnostic singular. The last factor is then numerical noise; consider
-  dropping one of the pair.
-- **Cluster ids are random labels.** `kmeans` is unseeded — groupings are
-  stable, id numbers are not. Seed for reproducibility.
-- **`scale=` dominates the result.** Correlation vs covariance scaling changes
-  the variance split from 56%/18% to 99%/… . Report your choice.
-- **`plot="map"` is verbose** — it emits the biplot plus many `spplot` pages;
-  send it to a multi-page device (PDF) or a PNG sequence if you want to keep
-  them.
-
-## 30. Glossary
+## 29. Glossary
 
 - **Loading** — weight relating a variable (R-mode) or sample (Q-mode) to a factor.
 - **Score** — a sample's/variable's coordinate on a factor.
@@ -1479,7 +1412,7 @@ the join — and logs each figure `ok`/`FAIL`.
 - **clusplot** — `cluster`'s ordination plot with group hulls.
 - **Mahalanobis distance** — multivariate distance used for outlier detection.
 
-## 31. Exercises
+## 30. Exercises
 
 1. **Retention.** From `mod$eigen.value`, how many factors pass the Kaiser
    rule? What cumulative variance do they carry? *(Answer: two; 74%.)*
@@ -1727,6 +1660,57 @@ extension with a real open question. *Deliverable:* a temporal-paradox paper.
 *(Nineteen projects. If fewer are needed, trim from the Geography or Medicine
 groups where routes overlap — do **not** drop Projects 15–19, the AQUASTAT set that
 directly extends the manual's own example.)*
+
+---
+
+## How to cite this manual
+
+The method implemented in `qrfactor` was introduced in a peer-reviewed paper;
+this manual is its applied companion. If you use the package or this manual in
+published work, please cite **both**.
+
+**The method (peer-reviewed source):**
+
+> Owusu, G. (2014). Developing R software for simultaneous estimation of Q- and
+> R-mode factor analyses using spatial and non-spatial data. *Mathematical
+> Theory and Modeling*, **4**(2). International Institute for Science, Technology
+> and Education (IISTE). ISSN 2224-5804 (print), 2225-0522 (online).
+
+**This manual:**
+
+> Owusu, G. (2026). *qrfactor: A manual to simultaneous Q- and R-mode factor
+> analysis of spatial data in R* (Version 1.5). Department of Geography and
+> Resource Development, University of Ghana.
+
+**BibTeX:**
+
+```bibtex
+@article{owusu2014qrfactor,
+  author  = {Owusu, George},
+  title   = {Developing {R} software for simultaneous estimation of
+             {Q-} and {R-}mode factor analyses using spatial and
+             non-spatial data},
+  journal = {Mathematical Theory and Modeling},
+  volume  = {4},
+  number  = {2},
+  year    = {2014},
+  publisher = {IISTE}
+}
+
+@manual{owusu2026qrfactormanual,
+  author       = {Owusu, George},
+  title        = {qrfactor: A Manual to Simultaneous Q- and R-mode
+                  Factor Analysis of Spatial Data in R},
+  note         = {Version 1.5},
+  organization = {Department of Geography and Resource Development,
+                  University of Ghana},
+  year         = {2026}
+}
+```
+
+Where the method's derivation or validation matters, cite the 2014 paper; where
+the workflow, arguments or worked African-water example are used, cite this
+manual. Citing both together is the intended practice.
 
 ---
 

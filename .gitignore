@@ -16,6 +16,9 @@ src/*.dll
 .DS_Store
 Thumbs.db
 
+# Claude Code settings
+.claude/
+
 # Regenerable manual repro output (kept out of git; a curated set of
 # figures will be committed with the finished manual)
 manual/repro_output.txt
@@ -24,3 +27,7 @@ manual/figures/
 
 # Paper 3 draft and working data — kept local only, not published in this repo
 paper/
+
+# Built manual HTML — not published (renders from the .md on GitHub; keeps
+# GitHub's language stats R-dominant instead of HTML-dominant)
+manual/*.html
