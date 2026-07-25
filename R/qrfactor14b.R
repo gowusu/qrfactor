@@ -591,6 +591,9 @@ cex="",pch=15,pos=3,main="",xlim="optimise",
 ylim="optimise",abline=TRUE,legend="topright",legendvalues=c(100),
 values=FALSE,nfactors=3,rowname=TRUE,par=c(1,2),...)
 {
+## Analysis flavour is matched case-insensitively, so type="PCA"/"pca",
+## "CA"/"ca", "MDS"/"mds", "Coord"/"coord" all dispatch to the same branch.
+if(is.character(type) && length(type)==1) type <- tolower(type)
 #if(nfactors==""){
 #nfactors=x$nfactors
 
@@ -922,7 +925,16 @@ par=c(1,2)
 par(mfrow=par)
 }
 
+## Honour plot="r" (R-mode loadings only) and plot="q" (Q-mode only); the
+## default ("" / "qr") draws both. plotarg is the preserved scalar keyword,
+## since the map branches reuse `plot` as a scratch variable further down.
+drawq <- !(length(plotarg)==1 && plotarg=="r")
+drawr <- !(length(plotarg)==1 && plotarg=="q")
+if(drawq){
 plot(x$q.loading[,factors[1]],x$q.loading[,factors[2]],xlab=xlab,ylab=ylab, main=main,cex=cex[[1]],pch=pch,xlim=xlim,ylim=ylim,...)
+}else{
+plot(x$r.loading[,factors[1]],x$r.loading[,factors[2]],xlab=xlab,ylab=ylab, main=main,cex=cex[[1]],pch=pch,xlim=xlim,ylim=ylim,...)
+}
 
 if(typeof(abline)!="logical"){
 abline(v=b1)
@@ -960,7 +972,9 @@ i=i+1
 }
 
 
-text(x$q.loading[,factors[1]],x$q.loading[,factors[2]], row.names( x$q.loading), cex=0.9, pos=pos,col="blue",new=TRUE)   
+if(drawq){
+text(x$q.loading[,factors[1]],x$q.loading[,factors[2]], row.names( x$q.loading), cex=0.9, pos=pos,col="blue",new=TRUE)
+}
 
 
 if(typeof(values)!="logical"){
@@ -986,8 +1000,10 @@ text(x$q.loading[,factors[1]],x$q.loading[,factors[2]], labels=values, cex=0.9, 
 
 }
 
+if(drawr){
 points(x$r.loading[,factors[1]],x$r.loading[,factors[2]],pch=1, main="R- and Q- Mode FA")
-text(x$r.loading[,factors[1]],x$r.loading[,factors[2]], row.names( x$r.loading), cex=1.1, pos=3, col="black",font=4)  
+text(x$r.loading[,factors[1]],x$r.loading[,factors[2]], row.names( x$r.loading), cex=1.1, pos=3, col="black",font=4)
+}
 
 if(this>1){
 legend=legend(legend, legend = round(legValsAvg,0), pch = pch, pt.cex = legVals,bty = "n", title = paste("Legend",cexa,sep=":"))
