@@ -21,3 +21,6 @@ Thumbs.db
 manual/repro_output.txt
 manual/repro_anova_dump.txt
 manual/figures/
+
+# Paper 3 draft and working data — kept local only, not published in this repo
+paper/
