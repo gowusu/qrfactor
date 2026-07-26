@@ -1,0 +1,24 @@
+url: https://gowusu.github.io/qrfactor
+
+template:
+  bootstrap: 5
+
+home:
+  title: qrfactor — Q-Mode and R-Mode Factor Analysis for Spatial Data in R
+  description: >
+    Simultaneous Q-mode and R-mode factor analysis for spatial and non-spatial
+    data in R. A single qrfactor() function runs principal component analysis,
+    R-mode and Q-mode factor analysis, principal coordinate analysis (PCoA),
+    multidimensional scaling (MDS) and correspondence analysis, with annotated
+    biplots, loadings, scores and spatial maps.
+
+navbar:
+  structure:
+    left:  [articles, reference]
+    right: [search, github]
+
+articles:
+- title: Manual
+  navbar: ~
+  contents:
+  - articles/qrfactor_manual

@@ -1,6 +1,11 @@
 ^cran-comments\.md$
 ^manual$
 ^paper$
+^_pkgdown\.yml$
+^build_pkgdown\.R$
+^docs$
+^vignettes$
+^\.gitattributes$
 ^README\.md$
 ^\.github$
 ^\.git$

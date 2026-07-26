@@ -36,13 +36,19 @@ packages:
 install.packages(c("sf", "sp"))
 ```
 
+## Documentation website
+
+Full documentation — the complete manual plus a function reference — is online at
+**<https://gowusu.github.io/qrfactor/>**.
+
 ## Manual
 
 A full, worked manual — every input mode, all six analyses, the plot method,
 the spatial maps and diagnostics, with every number and figure produced by
 running the package on the bundled African freshwater data:
 
-- [Read the manual (Markdown)](manual/qrfactor_manual.md) — renders on GitHub
+- **[Read it online](https://gowusu.github.io/qrfactor/articles/qrfactor_manual.html)** — on the documentation website
+- [Source on GitHub (Markdown)](https://github.com/gowusu/qrfactor/blob/main/manual/qrfactor_manual.md) — renders in the repo
 - `manual/qrfactor_manual.docx` — Word version (Save As → PDF for a printable copy)
 - `manual/reproduce_manual.R` — regenerates every table and figure
 

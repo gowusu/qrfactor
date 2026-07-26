@@ -31,3 +31,8 @@ paper/
 # Built manual HTML — not published (renders from the .md on GitHub; keeps
 # GitHub's language stats R-dominant instead of HTML-dominant)
 manual/*.html
+
+# pkgdown: built site and generated articles are artifacts, never on the default
+# branch (the site is deployed to the gh-pages branch by build_pkgdown.R)
+docs/
+vignettes/

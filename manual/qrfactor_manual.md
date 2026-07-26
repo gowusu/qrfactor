@@ -1,6 +1,6 @@
-# qrfactor
+# Simultaneous Q- and R-Mode Factor Analysis of Spatial Data in R
 
-**A manual to simultaneous Q- and R-mode factor analysis of spatial data in R**
+**A complete guide to the `qrfactor` package**
 
 This manual teaches the `qrfactor` R package from the ground up. It assumes
 only basic R literacy and explains every term as it appears. **Part 1** runs
