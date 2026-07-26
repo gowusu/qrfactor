@@ -1,0 +1,9 @@
+pandoc: 3.1.11
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  articles/qrfactor_manual: qrfactor_manual.html
+last_built: 2026-07-26T14:15Z
+urls:
+  reference: https://gowusu.github.io/qrfactor/reference
+  article: https://gowusu.github.io/qrfactor/articles
