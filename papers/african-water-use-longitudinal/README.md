@@ -1,6 +1,6 @@
 # Stable structure, growing use: a longitudinal Q/R-mode factor analysis of African water use, 2000–2021
 
-Analysis code and derived data for the paper (George Owusu, *Water Resources Management*).
+Analysis code and derived data for the paper by George Owusu.
 Everything reproduces from public FAO AQUASTAT data using the [`qrfactor`](../../) R package.
 
 ## Run order
